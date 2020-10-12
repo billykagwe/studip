@@ -1,0 +1,3 @@
+const mutations = {
+    login:() => 'hello'
+}

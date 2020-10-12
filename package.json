@@ -1,0 +1,52 @@
+{
+  "name": "my-next-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "jest --watch",
+    "migrate": "knex migrate:latest",
+    "unmigrate": "knex migrate:rollback",
+    "seed": "knex seed:run "
+  },
+  "dependencies": {
+    "@apollo/client": "^3.0.2",
+    "@prisma/client": "^2.4.1",
+    "@sendgrid/mail": "^7.2.0",
+    "apollo-cache-persist": "^0.1.1",
+    "apollo-link-error": "^1.1.13",
+    "apollo-server-micro": "^2.16.0",
+    "babel-jest": "^26.1.0",
+    "bcryptjs": "^2.4.3",
+    "dataloader": "^2.0.0",
+    "formik": "^2.1.4",
+    "graphql": "^15.3.0",
+    "immutable": "^4.0.0-rc.12",
+    "immutable-ext": "^1.1.5",
+    "jest": "^26.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^0.21.1",
+    "mssql": "^6.2.3",
+    "next": "9.4.4",
+    "next-iron-session": "^4.1.7",
+    "papaparse": "^5.2.0",
+    "pg": "^8.2.1",
+    "postcss-preset-env": "^6.7.0",
+    "rambda": "^6.2.0",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-dropzone": "^11.0.1",
+    "swr": "^0.3.0",
+    "swr-mutate-many": "^1.0.0",
+    "tailwindcss": "^1.4.6",
+    "uuid": "^8.1.0",
+    "validatorjs": "^3.18.1",
+    "xlsx": "^0.16.1",
+    "yup": "^0.29.1"
+  },
+  "devDependencies": {
+    "@prisma/cli": "^2.4.1"
+  }
+}
