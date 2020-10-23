@@ -6,6 +6,7 @@ const { Task, Either, EitherT } = require('./types.js')
 const { List } = require('immutable-ext')
 import { v4 as uuid } from 'uuid'
 import db from '../src/config/db'
+import { sendEmail } from './sendEmail'
 
 export const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm
 export const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -26,14 +27,17 @@ export const generateId = (user) => Task.of({ ...user, id: uuid() })
 export const createLoginAccount = (student) =>
     Task((rej, res) =>
         db('users')
-            .insert({ email: student?.email, id: uuid(), role: 'student' })
+            .insert({ email: student?.email, id: uuid(), role: 'STUDENT' })
             .returning('id')
             .then((id) => {
                 console.log(id)
                 res({ ...student, id: id[0] })
             })
             .catch((err) =>
-                rej(` ${errors[err.code]}` || `Server error,please refresh`)
+                rej(
+                    `${student.name} ${errors[err.code]}` ||
+                        `Server error,please refresh`
+                )
             )
     )
 
@@ -78,9 +82,8 @@ export const update_student_status = ({
             .catch((err) => rej(err))
     )
 
-export const get_message_details = ({ url, msg }) => ({ name, email }) => {
-    return sendEmail({ url, email, name, msg })
-}
+export const get_message_details = ({ url, msg }) => ({ name, email }) =>
+    sendEmail({ url, email, name, msg })
 
 export const saveSchool = ({ phone, location, name }) => (id) => {
     return Task((rej, res) =>
@@ -112,8 +115,9 @@ export const saveUser = (user) => {
     )
 }
 
-export const updatedUser = ({ token, password }) =>
-    Task((rej, res) =>
+export const updatedUser = ({ token, password }) => {
+    console.log(token)
+    return Task((rej, res) =>
         db('users')
             .where('id', '=', token)
             .update({
@@ -122,7 +126,7 @@ export const updatedUser = ({ token, password }) =>
             .then(() => res('Account approval success'))
             .catch(() => rej('Student account not found'))
     )
-
+}
 export const hashPassword = ([user]) => {
     return Task((rej, res) =>
         bcrypt
@@ -274,8 +278,9 @@ export const validate_school = (school) => validate(signup_validations, school)
 export const validate_login = (cred) => validate(login_validations, cred)
 export const validate_company = (company) =>
     validate(company_validations, company)
-export const validate_student = (cred) => student_validations(cred)
-export const recruit_validation = (cred) => validate(recruit_validations, cred)
+export const validate_student = (cred) => validate(student_validations, cred)
+export const recruit_validation = (recruits) =>
+    validate(recruit_validations, recruits)
 
 const valid_email = (val) => emailRegex.test(val)
 const valid_val = (val) => val && val.length > 2 && val.length < 20

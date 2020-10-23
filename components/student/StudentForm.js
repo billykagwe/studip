@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react'
-import Input from '../components/Input'
-import { validateValue, passwordRegex } from '../utils/validate'
-import Referee from '../components/student/Referee'
-import EducationForm from '../components/student/EducationForm'
-import withSession from '../lib/session'
-import db from '../src/config/db'
+import FormContent from '../components/FormContent'
+import Input from '../Input'
+import next from 'next'
+import { validateValue, passwordRegex } from '../../utils/validate'
+import useSWR from 'swr'
+import fetchJson from '../../lib/fetchJson'
+import Referee from './Referee'
+import EducationForm from './EducationForm'
 
 function StudentForm({ student }) {
+    /*
+        include : - Education Background
+                  - voluntary work
+                  - hobbies and skills
+
+    */
     const [profileInfo, setProfileInfo] = useState({
         email: student?.email,
         phone: student?.phone,
@@ -376,22 +384,3 @@ function StudentForm({ student }) {
 }
 
 export default StudentForm
-
-export const getServerSideProps = withSession(async function ({ req, res }) {
-    const user = req.session.get('user')
-    console.log('i', user)
-    const students = await db('users')
-        // .select('*')
-        .select('*')
-        .where({ 'users.id': user.id })
-        .join('students', 'students.id', '=', 'users.id')
-
-    delete students[0].password
-    console.log(students[0])
-
-    return {
-        props: {
-            student: students[0],
-        },
-    }
-})

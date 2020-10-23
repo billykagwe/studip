@@ -11,6 +11,7 @@ import {
 
 export const recruit_student = withSession(async function (req, res) {
     const { statement, listing_id } = req.body
+
     const url = 'http://localhost:3000/login'
     const start_date = new Date()
     const end_date = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
@@ -22,16 +23,20 @@ export const recruit_student = withSession(async function (req, res) {
         end_date,
     })
 
-    const process_recruitment = (recruit) =>
-        Task.of(recruit).chain(update_with_id).chain(send_onboarding_message)
+    const process_recruitment = (recruit) => {
+        return Task.of(recruit)
+            .chain(update_with_id)
+            .chain(send_onboarding_message)
+    }
 
-    const recruit_handler = ({ recruits }) =>
-        List.of(...recruits).traverse(Task.of, process_recruitment)
+    const recruit_handler = ({ recruits }) => {
+        return List.of(...recruits).traverse(Task.of, process_recruitment)
+    }
 
     recruit_validation(req.body)
         .fold(Task.rejected, Task.of)
-        .chain(recruit_handler)
-        .fork(formatError(res), formatSuccess(res))
+        .chain((validationResult) => recruit_handler(validationResult[0]))
+        .fork((x) => res.json(x), res.json)
 })
 
 export default recruit_student
